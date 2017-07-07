@@ -11,16 +11,34 @@
     </condition>
     <property name="warname" value= "JavaHelloWorldApp.war"/>
     
-    <target name="init">
-        <mkdir dir="bin"/>
-    </target>
-    <target name="clean">
+	<path id="classpathDir">
+      <path location="lib">
+	    <fileset dir="lib" includes="*.jar" />
+	  </path>
+	  <path location="bin" />
+    </path>
+	
+	<target name="clean">
         <delete dir="bin"/>
+		<delete dir="lib"/>
+		<delete dir="reports"/>
 		<delete file="${ARCHIVE_DIR}/${warname}" />		
     </target>
-    <target name="build" depends="build-project,build-war"/>
-    <target name="cleanall" depends="clean"/>
-    <target name="build-project" depends="clean,init">
+	
+    <target name="init" depends="clean">
+        <mkdir dir="bin"/>
+		<mkdir dir="lib" />
+	    <mkdir dir="reports" />
+    </target>
+	
+    	
+	<target name="copy" depends="init">
+      <copy overwrite="true" todir="lib">
+	    <fileset dir="D:\junit-4.12" includes="*.jar" />
+	  </copy>
+    </target>
+	
+	<target name="build-project" depends="copy">
     	<copy todir="${ARCHIVE_DIR}">
 	      <fileset file="manifest.yml" />
 	    </copy>
@@ -31,8 +49,17 @@
             <classpath refid="classpathDir"/>
         </javac>
     </target>
- 
-   <target name="build-war" depends="build-project">
+	
+	<target name="run-junit" depends="build-project">
+     <!-- <java classpathref="classpath" classname="MyTestRunner" /> -->
+      <junit haltonfailure="false" printsummary="true">
+        <classpath refid="classpathDir" />
+	    <test name="com.devops.test.MyClassTest" todir="reports" />
+	    <formatter type="xml" />
+      </junit>
+    </target>
+	
+	<target name="build-war" depends="run-junit">
 	  <war destfile="${ARCHIVE_DIR}/${warname}" webxml="WebContent/WEB-INF/web.xml">
 	  	<webinf dir="WebContent/WEB-INF">
 	  		<include name="resources"/>
@@ -43,5 +70,7 @@
 	  	<classes dir="bin"/>
 	  </war>
    </target>
-
+	
+    <target name="build" depends="build-war"/>
+	
 </project>
