@@ -2,6 +2,7 @@ package com.devops.test;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import com.devops.code.MyClass;
 
 public class MyClassTest
 { 
